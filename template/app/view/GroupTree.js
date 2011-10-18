@@ -30,13 +30,23 @@ Ext.define('Docs.view.GroupTree', {
     },
     
     setLanguage: function(lang) {
+    	var oldLang = this.language;
     	this.language = lang;
+
+    	var selected = this.getSelectionModel().getLastSelected();
+
     	var root = this.createTree();
 		this.setRootNode(root);
 		this.initNodeLinks();
 
 		// expand first child
 		this.getRootNode().getChildAt(0).expand();
+		
+		if (selected) {
+			var re = new RegExp("/" + oldLang + "/");
+			var url = selected.raw.url.replace(re, "/" + lang + "/");
+			this.selectUrl(url);
+		}
     },
     
     createTree: function() {
