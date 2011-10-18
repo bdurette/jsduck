@@ -56,7 +56,7 @@ module JsDuck
         input = IO.read(guide_file);
         input.gsub!(/\357\274\203/, "#")
 
-        html = @formatter.format(IO.read(guide_file))
+        html = @formatter.format(input)
         name = File.basename(in_dir)
         html.gsub!(/<img src="/, "<img src=\"guides/#{name}/")
   
