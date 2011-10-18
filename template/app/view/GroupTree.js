@@ -8,7 +8,8 @@
 Ext.define('Docs.view.GroupTree', {
     extend: 'Docs.view.DocTree',
     alias: 'widget.grouptree',
-
+	language: 'en',
+	
     /**
      * @cfg {Object[]} data (required)
      * An array of guoups. Each group is object with properties:
@@ -24,19 +25,32 @@ Ext.define('Docs.view.GroupTree', {
      */
 
     initComponent: function() {
-        this.root = {
-            children: [],
-            text: 'Root'
-        };
+        this.root = this.createTree();
+        this.callParent();
+    },
+    
+    setLanguage: function(lang) {
+    	this.language = lang;
+    	var root = this.createTree();
+		this.setRootNode(root);
+		this.initNodeLinks();
 
+		// expand first child
+		this.getRootNode().getChildAt(0).expand();
+    },
+    
+    createTree: function() {
+    	var root = {
+    		children: [],
+    		text: 'Root'
+    	};
         Ext.Array.each(this.data, function(group) {
-            this.root.children.push({
+            root.children.push({
                 text: group.title,
-                children: Ext.Array.map(group.items, this.convert),
+                children: Ext.Array.map(group.items, this.convert, this),
                 iconCls: 'icon-pkg'
             });
         }, this);
-
-        this.callParent();
+        return root;
     }
 });

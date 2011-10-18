@@ -670,6 +670,10 @@
                     "name": "Tree.js"
                 },
                 {
+                	"path": "app/view/guides/",
+                	"name": "Tree.js"
+                },
+                {
                     "path": "app/view/",
                     "name": "GroupTree.js"
                 },

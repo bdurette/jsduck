@@ -37,6 +37,28 @@ Ext.define('Docs.controller.Guides', {
             '#guidetree': {
                 urlclick: function(url, event) {
                     this.handleUrlClick(url, event, this.getTree());
+                },
+                afterrender: function(cmp) {
+                	cmp.el.addListener('click', function(e, el) {
+                		var clicked = Ext.get(el);
+                		var selected = Ext.get(Ext.query('.cls-lang button.selected')[0]);
+                		if (selected.dom ===  clicked.dom) {
+                			return;
+                		}
+                		
+                		selected.removeCls('selected');
+                		clicked.addCls('selected');
+                		
+                		// TODO - Make this more generic for more languages.
+                		var tree = this.getTree();
+                		if (clicked.hasCls('lang-en')) {
+                			this.getTree().setLanguage('en');
+                		} else {
+                			this.getTree().setLanguage('zh_hans');
+                		}
+                	}, this, {
+                		delegate: 'button'
+                	});
                 }
             },
             'guideindex > thumblist': {
@@ -96,21 +118,23 @@ Ext.define('Docs.controller.Guides', {
     loadGuide: function(url, noHistory) {
         Ext.getCmp('card-panel').layout.setActiveItem('guide');
         Ext.getCmp('treecontainer').showTree('guidetree');
-        var name = url.match(/^#!\/guide\/(.*)$/)[1];
+        var parsedUrl = url.match(/^#!\/guide\/(.*)\/(.*)$/);
+        var lang = parsedUrl[1];
+        var name = parsedUrl[2];
 
         noHistory || Docs.History.push(url);
 
-        if (this.cache[name]) {
-            this.showGuide(this.cache[name], url, name);
+        if (this.cache[lang + "/" + name]) {
+            this.showGuide(this.cache[lang + "/" + name], url, name, lang);
         }
         else {
             this.cache[name] = "in-progress";
             Ext.data.JsonP.request({
-                url: this.getBaseUrl() + "/guides/" + name + "/README.js",
+                url: this.getBaseUrl() + "/guides/" + name + "/README." + lang + ".js",
                 callbackName: name,
                 success: function(json) {
-                    this.cache[name] = json;
-                    this.showGuide(json, url, name);
+                    this.cache[lang + "/" + name] = json;
+                    this.showGuide(json, url, name, lang);
                 },
                 failure: function(response, opts) {
                     this.getController('Index').showFailure("Guide <b>"+name+"</b> was not found.");
@@ -127,7 +151,7 @@ Ext.define('Docs.controller.Guides', {
      * @param {String} url URL of the guide
      * @param {Boolean} name Name of the guide
      */
-    showGuide: function(json, url, name) {
+    showGuide: function(json, url, name, lang) {
         if (json === "in-progress") {
             return;
         }
