@@ -6,6 +6,7 @@ Ext.define('Docs.view.TreeContainer', {
     alias: 'widget.treecontainer',
     requires: [
         'Docs.view.cls.Tree',
+        'Docs.view.guides.Tree',
         'Docs.view.GroupTree'
     ],
 
@@ -44,14 +45,14 @@ Ext.define('Docs.view.TreeContainer', {
                 }
             },
             {
-                xtype: 'grouptree',
+                xtype: 'guidetree',
                 id: 'guidetree',
                 data: Docs.data.guides,
                 convert: function(guide) {
                     return {
                         leaf: true,
-                        text: guide.title,
-                        url: '#!/guide/' + guide.name,
+                        text: guide.title[this.language],
+                        url: '#!/guide/' + this.language + "/" + guide.name,
                         iconCls: 'icon-guide'
                     };
                 }

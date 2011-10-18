@@ -41,19 +41,28 @@ module JsDuck
         return Logger.instance.warn("Guide #{guide_dir} / #{tutorial_dir} not found")
       end
 
-      guide_file = in_dir + "/README.md"
-      return Logger.instance.warn("README.md not found in #{in_dir}") unless File.exists?(guide_file)
+      guide["title"].each_pair do |lang, title|
+        guide_file = in_dir + "/README." + lang + ".md"
+        return Logger.instance.warn("README.#{lang}.md not found in #{in_dir}") unless File.exists?(guide_file)
 
-      Logger.instance.log("Writing guide #{out_dir} ...")
-      # Copy the whole guide dir over
-      FileUtils.cp_r(in_dir, out_dir)
+        Logger.instance.log("Writing #{lang} guide #{out_dir} ...")
+        # Copy the whole guide dir over
+        FileUtils.cp_r(in_dir, out_dir)
+  
+        @formatter.doc_context = {:filename => guide_file, :linenr => 0}
 
-      @formatter.doc_context = {:filename => guide_file, :linenr => 0}
-      name = File.basename(in_dir)
-      @formatter.img_path = "guides/#{name}"
-      html = @formatter.format(IO.read(guide_file))
+        # Replace the ＃with #. This is a workaround for Google translate
+        # changing the # character.
+        input = IO.read(guide_file);
+        input.gsub!(/\357\274\203/, "#")
 
-      JsonDuck.write_jsonp(out_dir+"/README.js", name, {:guide => html, :title => guide["title"]})
+        @formatter.img_path = "guides/#{name}"
+        html = @formatter.format(input)
+        name = File.basename(in_dir)
+        html.gsub!(/<img src="/, "<img src=\"guides/#{name}/")
+  
+        JsonDuck.write_jsonp(out_dir+"/README.#{lang}.js", name, {:guide => html, :title => title})
+      end
     end
 
     # Returns all guides as array

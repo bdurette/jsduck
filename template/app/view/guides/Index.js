@@ -18,7 +18,7 @@ Ext.define('Docs.view.guides.Index', {
             Ext.create('Docs.view.ThumbList', {
                 itemTpl: [
                     '<dd ext:url="#!/guide/{name}"><div class="thumb"><img src="guides/{name}/icon-lg.png"/></div>',
-                        '<div><h4>{title}</h4><p>{description}</p></div>',
+                        '<div><h4>{title.en}</h4><p>{description.en}</p></div>',
                     '</dd>'
                 ],
                 data: Docs.data.guides
