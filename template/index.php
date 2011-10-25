@@ -37,8 +37,8 @@ if (isset($_GET["_escaped_fragment_"]) || isset($_GET["print"])) {
     elseif (preg_match('/^\/api\/?$/', $fragment, $m)) {
       print_index_page();
     }
-    elseif (preg_match('/^\/guide\/(.+)/', $fragment, $m)) {
-      $json = decode_file("guides/".$m[1]."/README.js");
+    elseif (preg_match('/^\/guide\/(.+)\/(.+)/', $fragment, $m)) {
+      $json = decode_file("guides/".$m[2]."/README.".$m[1].".js");
       print_page($json["title"], '<div id="guide" style="padding: 1px">' . $json["guide"] . '</div>', $fragment);
     }
     elseif (preg_match('/^\/guide\/?$/', $fragment, $m)) {
